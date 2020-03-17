@@ -10,7 +10,7 @@ type RegionItem struct {
 	Name string
 }
 
-func parseRegion(src []byte) []RegionItem {
+func ParseRegion(src []byte) []RegionItem {
 	matchRes := RegionRe.FindAllSubmatch(src, -1)
 	var regionItems []RegionItem
 	for _, m := range matchRes {

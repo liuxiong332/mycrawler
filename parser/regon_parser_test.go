@@ -15,7 +15,7 @@ func TestRegionParser(t *testing.T) {
 		Name string
 	}{{"http://www.zhenai.com/zhenghun/aba", "阿坝"}, {"http://www.zhenai.com/zhenghun/akesu", "阿克苏"}}
 
-	items := parseRegion([]byte(TestStr))
+	items := ParseRegion([]byte(TestStr))
 
 	for i, res := range items {
 		if res.Name != expectRes[i].Name || res.Url != expectRes[i].Url {
