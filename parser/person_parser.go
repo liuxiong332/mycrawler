@@ -2,22 +2,24 @@ package parser
 
 import (
 	"bytes"
-	"github.com/PuerkitoBio/goquery"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 type PersonInfo struct {
-	Name string
-	Id string
-	Region string
-	Age int
-	Edu string
+	Name          string
+	Id            string
+	Region        string
+	Age           int
+	Edu           string
 	MaritalStatus string
-	Height int
-	Weight int
-	Salary [2]int
+	Height        int
+	Weight        int
+	Salary        [2]int
 }
 
 func atoIOrDef(text string, def int) int {
@@ -31,27 +33,31 @@ func atoIOrDef(text string, def int) int {
 func extractInt(text string, reg *regexp.Regexp) int {
 	findRes := reg.FindSubmatch([]byte(text))
 	if findRes != nil {
-		return atoIOrDef(string(findRes[1]) , 0)
+		return atoIOrDef(string(findRes[1]), 0)
 	}
 	return 0
 }
 
-var AgeRe = regexp.MustCompile(`(\d+)岁`);
+var AgeRe = regexp.MustCompile(`(\d+)岁`)
+
 func extractAge(text string) int {
 	return extractInt(text, AgeRe)
 }
 
 var HeightRe = regexp.MustCompile(`(\d+)cm`)
+
 func extractHeight(text string) int {
 	return extractInt(text, HeightRe)
 }
 
 var WeightRe = regexp.MustCompile(`(\d+)kg`)
+
 func extractWeight(text string) int {
 	return extractInt(text, WeightRe)
 }
 
 var IdRe = regexp.MustCompile(`ID：(\d+)`)
+
 func extractId(text string) string {
 	findRes := IdRe.FindSubmatch([]byte(text))
 	if findRes == nil {
@@ -61,12 +67,13 @@ func extractId(text string) string {
 }
 
 var SalaryRe = regexp.MustCompile(`(\d+)-(\d+)元`)
+
 func extractSalary(text string) [2]int {
 	match := SalaryRe.FindSubmatch([]byte(text))
 	if match != nil {
-		return [2]int { atoIOrDef(string(match[1]), 0), atoIOrDef(string(match[2]), 0) }
+		return [2]int{atoIOrDef(string(match[1]), 0), atoIOrDef(string(match[2]), 0)}
 	}
-	return [2]int {0, 0}
+	return [2]int{0, 0}
 }
 
 func ParsePerson(html []byte) (PersonInfo, error) {
@@ -103,4 +110,17 @@ func ParsePerson(html []byte) (PersonInfo, error) {
 		}
 	})
 	return personInfo, nil
+}
+
+func ParsePersonRes(src []byte) (ParserResult, error) {
+
+	log.Printf("Will parse person result")
+	var requests []RequestInfo
+
+	personInfo, err := ParsePerson(src)
+	if err != nil {
+		return ParserResult{}, err
+	}
+	var payload = []interface{}{personInfo}
+	return ParserResult{payload, requests}, nil
 }
