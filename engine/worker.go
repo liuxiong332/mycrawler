@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func workRequest(req parser.RequestInfo) []parser.RequestInfo {
+func WorkRequest(req parser.RequestInfo) []parser.RequestInfo {
 	log, err := zap.NewProduction()
 
 	if err != nil {
@@ -67,7 +67,7 @@ func (w *Worker) Run() {
 	for {
 		w.notifier.WorkerReady(w.inputChan)
 		req := <-w.inputChan
-		outRes := workRequest(req)
+		outRes := WorkRequest(req)
 		w.outChan <- outRes
 	}
 }

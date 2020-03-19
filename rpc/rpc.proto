@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+import "google/protobuf/any.proto";
+
+package rpc;
+// The greeting service definition.
+service CrawlerWork {
+  // Sends a greeting
+  rpc Process (WorkerRequest) returns (WorkerResult) {}
+}
+
+message WorkerRequest {
+  string url = 1;
+  string type = 2;
+}
+
+message RequestInfo {
+  string url = 1;
+  string type = 2;
+}
+
+message WorkerResult {
+  repeated google.protobuf.Any payload = 1;
+  repeated RequestInfo requests = 2;
+}
+
+message PersonBriefPayload {
+  string url = 1;
+  string name = 2;
+}
+
+message PersonPayload {
+  string name = 1;
+  string id = 2;
+  string region = 3;
+  int32 age = 4;
+  string edu = 5;
+  string maritalStatus = 6;
+  int32 height = 7;
+  int32 weight = 8;
+  repeated int32 salary = 9;
+}
