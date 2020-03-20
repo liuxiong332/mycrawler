@@ -8,7 +8,9 @@ import (
 
 const InitialUrl = "http://www.zhenai.com/zhenghun"
 
-func RunEngine() {
+type WorkerCreator func(WorkerNotifier, chan<- []parser.RequestInfo) WorkerRunner
+
+func RunEngine(workerCreator WorkerCreator) {
 	runQueue := []parser.RequestInfo{
 		{
 			Url:    InitialUrl,
@@ -23,7 +25,8 @@ func RunEngine() {
 	go scheduler.Run()
 	// 启动20个 worker goroutine 去开始爬虫任务
 	for i := 0; i < 20; i += 1 {
-		worker := NewWorker(scheduler, workerChan)
+		//worker := NewWorker(scheduler, workerChan)
+		worker := workerCreator(scheduler, workerChan)
 		go worker.Run()
 	}
 

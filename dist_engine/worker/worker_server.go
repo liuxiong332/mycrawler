@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
+	"crawler/dist_engine/util"
 	"crawler/engine"
 	"crawler/parser"
 	"crawler/rpc"
 	"log"
 	"net"
-	"reflect"
 
 	"github.com/golang/protobuf/ptypes"
 
@@ -26,14 +26,7 @@ func convertReqInfo(req *rpc.WorkerRequest) parser.RequestInfo {
 	target := parser.RequestInfo{}
 
 	target.Url = req.Url
-	switch req.Type {
-	case "Person":
-		target.Parser = parser.ParsePersonRes
-	case "PersonBrief":
-		target.Parser = parser.ParsePersonBriefRes
-	case "Region":
-		target.Parser = parser.ParseRegionRes
-	}
+	target.Parser = util.ConvertReqType(req.Type)
 	return target
 }
 
@@ -48,8 +41,10 @@ func convertResult(res []parser.RequestInfo) *rpc.WorkerResult {
 
 	retRes.Payload = append(retRes.Payload, payloadRes)
 	for _, m := range res {
-		req := rpc.RequestInfo{}
-		reflect.Copy(reflect.ValueOf(req), reflect.ValueOf(m))
+		req := rpc.RequestInfo{
+			Url:  m.Url,
+			Type: util.ConvertReqParser(m.Parser),
+		}
 		retRes.Requests = append(retRes.Requests, &req)
 	}
 	return &retRes

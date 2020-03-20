@@ -45,29 +45,33 @@ func WorkRequest(req parser.RequestInfo) []parser.RequestInfo {
 	return res.Requests
 }
 
-type Worker struct {
-	inputChan chan parser.RequestInfo
-	outChan   chan<- []parser.RequestInfo
-	notifier  WorkerNotifier
-}
-
-func NewWorker(notifier WorkerNotifier, outChan chan<- []parser.RequestInfo) *Worker {
-	w := Worker{}
-	w.inputChan = make(chan parser.RequestInfo)
-	w.notifier = notifier
-	w.outChan = outChan
-	return &w
-}
-
 type WorkerNotifier interface {
 	WorkerReady(chan parser.RequestInfo)
 }
 
+type WorkerRunner interface {
+	Run()
+}
+
+type Worker struct {
+	InputChan chan parser.RequestInfo
+	OutChan   chan<- []parser.RequestInfo
+	Notifier  WorkerNotifier
+}
+
+func NewWorker(notifier WorkerNotifier, outChan chan<- []parser.RequestInfo) WorkerRunner {
+	w := Worker{}
+	w.InputChan = make(chan parser.RequestInfo)
+	w.Notifier = notifier
+	w.OutChan = outChan
+	return &w
+}
+
 func (w *Worker) Run() {
 	for {
-		w.notifier.WorkerReady(w.inputChan)
-		req := <-w.inputChan
+		w.Notifier.WorkerReady(w.InputChan)
+		req := <-w.InputChan
 		outRes := WorkRequest(req)
-		w.outChan <- outRes
+		w.OutChan <- outRes
 	}
 }

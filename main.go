@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	engine.RunEngine()
+	engine.RunEngine(engine.NewWorker)
 }
